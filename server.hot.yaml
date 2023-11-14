@@ -74,7 +74,7 @@ resources:
       instance_uuid: {get_resource: server}
 
   volumeMicrok8s:
-    type: OS::Cinder::Volume
+    type: volume.tpl.hot.yaml
     condition: microk8s
     properties:
       availability_zone: {get_param: availability_zone}
@@ -83,16 +83,10 @@ resources:
       name: {list_join: ["-",[{get_param: name},"microk8s"]]}
       size: {get_param: volume_size_microk8s}
       volume_type: {get_param: volume_type}
-
-  volumeMicrok8sAttachment:
-    type: OS::Cinder::VolumeAttachment
-    condition: microk8s
-    properties:
       instance_uuid: {get_resource: server}
-      volume_id: {get_resource: volumeMicrok8s}
 
   volumeLXD:
-    type: OS::Custom::VolumeAttach
+    type: volume.tpl.hot.yaml
     condition: lxd
     properties:
       availability_zone: {get_param: availability_zone}
