@@ -22,14 +22,14 @@ resources:
       description: {get_param: description}
       metadata: {get_param: metadata}
       name: {get_param: name}
-      size: {get_param: volume_size}
+      size: {get_param: size}
       volume_type: {get_param: volume_type}
 
   volumeAttachment:
     type: OS::Cinder::VolumeAttachment
     condition: volumeCreate
     properties:
-      instance_uuid: {get_resource: server}
+      instance_uuid: {get_param: instance_uuid}
       volume_id: {get_resource: volume}
 
 outputs:
