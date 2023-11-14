@@ -63,7 +63,7 @@ resources:
     condition: createDnsRR
 
   volume:
-    type: volume.tpl.hot.yaml
+    type: OS::Custom::VolumeAttach
     condition: attachVolume
     properties:
       availability_zone: {get_param: availability_zone}
@@ -74,7 +74,7 @@ resources:
       instance_uuid: {get_resource: server}
 
   volumeMicrok8s:
-    type: volume.tpl.hot.yaml
+    type: OS::Custom::VolumeAttach
     condition: microk8s
     properties:
       availability_zone: {get_param: availability_zone}
@@ -86,7 +86,7 @@ resources:
       instance_uuid: {get_resource: server}
 
   volumeLXD:
-    type: volume.tpl.hot.yaml
+    type: OS::Custom::VolumeAttach
     condition: lxd
     properties:
       availability_zone: {get_param: availability_zone}
