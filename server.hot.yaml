@@ -6,10 +6,10 @@ parameters:
   availability_zone: {type: string, default: nova}
   designate_enabled: {type: boolean, default: true}
   flavor: {type: string}
-  network_public: {type: string, default: None}
+  network_public: {type: string, default: ""}
   image: {type: string}
   key_name: {type: string}
-  metadata: {type: json, default: '{}'}
+  metadata: {type: json, default: {}}
   name: {type: string}
   network: {type: string}
   networks: {type: json, default: []}
@@ -24,7 +24,7 @@ parameters:
   allowed_address_pairs: {type: json, default: []}
 
 conditions:
-  attachFloatingIP: {not: {equals: [{get_param: network_public}, None]}}
+  attachFloatingIP: {not: {equals: [{get_param: network_public}, ""]}}
   attachVolume: {not: {equals: [{get_param: volume_size}, 0]}}
   createDnsRR:
     and:
@@ -63,25 +63,18 @@ resources:
     condition: createDnsRR
 
   volume:
-    type: OS::Cinder::Volume
+    type: volume.tpl.hot.yaml
     condition: attachVolume
     properties:
       availability_zone: {get_param: availability_zone}
-      description: ""
       metadata: {get_param: metadata}
       name: {get_param: name}
       size: {get_param: volume_size}
       volume_type: {get_param: volume_type}
-
-  volumeAttachment:
-    type: OS::Cinder::VolumeAttachment
-    condition: attachVolume
-    properties:
       instance_uuid: {get_resource: server}
-      volume_id: {get_resource: volume}
 
   volumeMicrok8s:
-    type: OS::Cinder::Volume
+    type: volume.tpl.hot.yaml
     condition: microk8s
     properties:
       availability_zone: {get_param: availability_zone}
@@ -90,16 +83,10 @@ resources:
       name: {list_join: ["-",[{get_param: name},"microk8s"]]}
       size: {get_param: volume_size_microk8s}
       volume_type: {get_param: volume_type}
-
-  volumeAttachmentMicrok8s:
-    type: OS::Cinder::VolumeAttachment
-    condition: microk8s
-    properties:
       instance_uuid: {get_resource: server}
-      volume_id: {get_resource: volumeMicrok8s}
 
   volumeLXD:
-    type: OS::Cinder::Volume
+    type: volume.tpl.hot.yaml
     condition: lxd
     properties:
       availability_zone: {get_param: availability_zone}
@@ -108,13 +95,7 @@ resources:
       name: {list_join: ["-",[{get_param: name},"lxd"]]}
       size: {get_param: volume_size_lxd}
       volume_type: {get_param: volume_type}
-
-  volumeAttachmentLXD:
-    type: OS::Cinder::VolumeAttachment
-    condition: lxd
-    properties:
       instance_uuid: {get_resource: server}
-      volume_id: {get_resource: volumeLXD}
 
   server:
     type: OS::Nova::Server
